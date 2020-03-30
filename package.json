@@ -1,0 +1,13 @@
+{
+  "name": "generalized-aave-flashloans",
+  "version": "1.0.0",
+  "description": "Generalized Aave Flashloans",
+  "directories": {
+    "test": "test"
+  },
+  "author": "Kendrick Tan kendricktan0814@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "@openzeppelin/contracts": "^2.5.0"
+  }
+}
