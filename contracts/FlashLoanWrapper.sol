@@ -60,10 +60,19 @@ contract FlashLoanWrapper is FlashLoanReceiverBase, BytesLibLite {
             _data
         );
 
+        // Sends the funds to the proxyAddress
+        if(_reserve == ETHADDRESS) {
+            //solium-disable-next-line
+            proxyAddress.call.value(_amount)("");
+        } else {
+            IERC20(_reserve).transfer(proxyAddress, _amount);
+        }
+
         // Assume that once this is completed
         // we will get enough funds to repay Aave
         DSProxy(proxyAddress).execute(_target, _newData);
 
+        // Transfer funds back to Aave
         transferFundsBackToPoolInternal(_reserve, _amount + _fee);
     }
 }

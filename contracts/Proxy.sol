@@ -19,6 +19,7 @@ pragma solidity 0.5.16;
 
 import "./lib/Auth.sol";
 import "./lib/Note.sol";
+import "./lib/Guard.sol";
 
 // DSProxy
 // Allows code execution using a persistant identity This can be very
@@ -94,11 +95,16 @@ contract DSProxy is DSAuth, DSNote {
 // Deployed proxy addresses are logged
 contract DSProxyFactory {
     event Created(address indexed sender, address indexed owner, address proxy, address cache);
-    mapping(address=>bool) public isProxy;
+    mapping(address => address) public proxies;
+
     DSProxyCache public cache;
+    DSGuardFactory public dsGuardFactory;
+
 
     constructor() public {
         cache = new DSProxyCache();
+        dsGuardFactory = new DSGuardFactory();
+
     }
 
     // deploys a new proxy instance
@@ -109,12 +115,26 @@ contract DSProxyFactory {
 
     // deploys a new proxy instance
     // sets custom owner of proxy
-    function build(address owner) public returns (address payable proxy) {
-        proxy = address(new DSProxy(address(cache)));
+    function build(address owner) public returns (address payable) {
+        // If user already has a proxy build, return that instead
+        if (proxies[owner] != address(0)) {
+            return address(uint160(proxies[owner]));
+        }
+
+        address payable proxy = address(new DSProxy(address(cache)));
         emit Created(msg.sender, owner, address(proxy), address(cache));
+
+        DSGuard guard = dsGuardFactory.newGuard();
+        guard.setOwner(proxy);  // Guard belongs to proxy
+
+        DSProxy(proxy).setAuthority(guard);
         DSProxy(proxy).setOwner(owner);
-        isProxy[proxy] = true;
+
+        proxies[owner] = proxy;
+
+        return proxy;
     }
+
 }
 
 // DSProxyCache
