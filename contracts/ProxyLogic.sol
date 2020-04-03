@@ -7,9 +7,12 @@ import "./lib/Guard.sol";
 import "./lib/FlashLoanReceiverBase.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 
 
 contract ProxyLogic {
+    using SafeMath for uint256;
+
     address constant ETHADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address constant AaveEthAddress = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address constant AaveLendingPoolAddressProviderAddress = 0x24a42fD28C976A61Df5D00D0599C34c4f90748c8;
@@ -58,14 +61,20 @@ contract ProxyLogic {
     ) external {
         MyCustomData memory d = abi.decode(_params, (MyCustomData));
 
+        uint repayAmount = _amount.add(_fee);
+
         // INSERT YOUR LOGIC HERE:
         // Do your arbitrage here / finance VM building blocks here
 
         // Once you're done you'll need to send the funds back to the wrapper,
         // as the wrapper is responsible for paying the fees back.
         // Otherwise the whole Tx fails
-        //solium-disable-next-line
-        d.flashloanWrapperAddress.call.value(_amount)("");
+        if(_reserve == ETHADDRESS) {
+            //solium-disable-next-line
+            d.flashloanWrapperAddress.call.value(repayAmount)("");
+        } else {
+            IERC20(_reserve).transfer(d.flashloanWrapperAddress, repayAmount);
+        }
     }
 
     // User tells proxy to execute this function

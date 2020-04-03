@@ -4,7 +4,11 @@ import "./lib/FlashLoanReceiverBase.sol";
 import "./lib/BytesLibLite.sol";
 import "./Proxy.sol";
 
+import "@openzeppelin/contracts/math/SafeMath.sol";
+
 contract FlashLoanWrapper is FlashLoanReceiverBase, BytesLibLite {
+    using SafeMath for uint256;
+
     constructor() public {}
 
     function() external payable {}
@@ -73,6 +77,6 @@ contract FlashLoanWrapper is FlashLoanReceiverBase, BytesLibLite {
         DSProxy(proxyAddress).execute(_target, _newData);
 
         // Transfer funds back to Aave
-        transferFundsBackToPoolInternal(_reserve, _amount + _fee);
+        transferFundsBackToPoolInternal(_reserve, _amount.add(_fee));
     }
 }
