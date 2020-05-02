@@ -1,7 +1,7 @@
 # generalized-aave-flashloans
 Generalized Aave Flashloans
 
-Use [upgradable smart proxy contracts (EIP1167)](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1167.md) in conjunction with flashloans!
+Use Proxies in conjunction with flashloans!
 
 
 # Getting started
