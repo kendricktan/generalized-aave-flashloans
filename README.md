@@ -11,7 +11,7 @@ npm install -g ganache-cli truffle mocha
 npm install
 
 # Run ganache in a separate terminal
-ganache-cli -f https://mainnet.infura.io/v3/<API_KET> -d
+ganache-cli -f https://mainnet.infura.io/v3/<API_KET> -d --networkId 1
 
 # Deploy contract
 truffle migrate --reset --network development
